@@ -14,6 +14,8 @@ namespace FastFoodOperator.Model
         public string? Name { get; set; }
         public int Price { get; set; }
 
+        public string? Test { get; set; }
+
 
     }
 }
