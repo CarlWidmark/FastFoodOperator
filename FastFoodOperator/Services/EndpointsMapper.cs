@@ -27,9 +27,14 @@ namespace FastFoodOperator.Services
             app.MapGet("/drinks", (PizzaShopContext context) => TypedResults.Ok(context.Drinks));
             app.MapPost("/orders", async (PizzaShopContext db, OrderRequest request) =>
             {
-                var pizzas = await db.Pizzas.Where(p => request.PizzaIds.Contains(p.Id)).ToListAsync();
-                var drinks = await db.Drinks.Where(d => request.DrinkIds.Contains(d.Id)).ToListAsync();
-                var extras = await db.Extras.Where(e => request.DrinkIds.Contains(e.Id)).ToListAsync();
+                var pizzasFromDb = await db.Pizzas.Where(p => request.PizzaIds.Contains(p.Id)).ToListAsync();
+                var drinksFromDb = await db.Drinks.Where(d => request.DrinkIds.Contains(d.Id)).ToListAsync();
+                var extrasFromDb = await db.Extras.Where(e => (request.ExtraIds ?? new()).Contains(e.Id)).ToListAsync();
+
+
+                var pizzas = request.PizzaIds.SelectMany(id => pizzasFromDb.Where(p => p.Id == id)).ToList();
+                var drinks = request.DrinkIds.SelectMany(id => drinksFromDb.Where(d => d.Id == id)).ToList();
+                var extras = (request.ExtraIds ?? new()).SelectMany(id => extrasFromDb.Where(e => e.Id == id)).ToList();
 
                 var order = new Order
                 {
@@ -37,7 +42,6 @@ namespace FastFoodOperator.Services
                     Drinks = drinks,
                     Extras = extras,
                     isComplete = false
-
                 };
 
                 db.Orders.Add(order);
