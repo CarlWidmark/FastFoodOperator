@@ -19,8 +19,6 @@ namespace FastFoodOperator.Model
                 .HasKey(pi => new { pi.PizzaId, pi.IngredientId });
         }
     }
-
-
     public class Pizza
     {
         public int Id { get; set; }
@@ -67,6 +65,8 @@ namespace FastFoodOperator.Model
         public List<Pizza>? Pizzas { get; set; }
         public List<Drink>? Drinks { get; set; }
         public List<Extra>? Extras { get; set; }
+        public bool isComplete { get; set; }
+
 
     }
 }
