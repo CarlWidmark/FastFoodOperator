@@ -23,9 +23,9 @@ namespace FastFoodOperator.Services
                      .Select(pi => pi.Ingredient.Name)
                      .ToList()
              })
-             .ToList()
-     )
- );
+             .ToList()));
+            app.MapGet("/drinks", (PizzaShopContext context) =>
+            TypedResults.Ok(context.Drinks));
         }
     }
 }

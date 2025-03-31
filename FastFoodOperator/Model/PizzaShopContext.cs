@@ -9,6 +9,9 @@ namespace FastFoodOperator.Model
         public DbSet<Pizza> Pizzas { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<PizzaIngredient> PizzaIngredients { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Drink> Drinks { get; set; }
+        public DbSet<Extra> Extras { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,7 +35,6 @@ namespace FastFoodOperator.Model
         public required string Name { get; set; }
         public decimal Price { get; set; }
         public ICollection<PizzaIngredient>? PizzaIngredients { get; set; }
-
     }
     public class PizzaIngredient
     {
@@ -41,5 +43,30 @@ namespace FastFoodOperator.Model
 
         public int IngredientId { get; set; }
         public Ingredient? Ingredient { get; set; }
+    }
+    public class Drink
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public required string Unit { get; set; }
+        public required decimal Size { get; set; }
+
+        public decimal Price { get; set; }
+
+    }
+    public class Extra
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public decimal Price { get; set; }
+
+    }
+    public class Order
+    {
+        public int Id { get; set; }
+        public List<Pizza>? Pizzas { get; set; }
+        public List<Drink>? Drinks { get; set; }
+        public List<Extra>? Extras { get; set; }
+
     }
 }
