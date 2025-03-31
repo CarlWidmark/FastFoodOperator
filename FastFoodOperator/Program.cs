@@ -30,7 +30,7 @@ namespace FastFoodOperator
                 var db = scope.ServiceProvider.GetRequiredService<PizzaShopContext>();
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
-                DatabaseHelper.PopulateDatabase(db, scope.ServiceProvider);
+                DatabaseHelper.PopulateDatabase(db);
             }
             app.MapEndpoints();
 
