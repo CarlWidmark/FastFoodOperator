@@ -13,11 +13,22 @@ namespace FastFoodOperator
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:5173")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                    });
+            });
 
             builder.Services.AddDbContext<PizzaShopContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("PizzaShopDb")));
 
             var app = builder.Build();
+            app.UseCors("AllowFrontend");
 
             if (app.Environment.IsDevelopment())
             {
