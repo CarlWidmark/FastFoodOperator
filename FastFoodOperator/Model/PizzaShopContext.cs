@@ -16,6 +16,8 @@ namespace FastFoodOperator.Model
 
         public string? Test { get; set; }
 
+        public List<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
 
     }
+
 }
