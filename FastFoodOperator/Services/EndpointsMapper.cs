@@ -1,4 +1,5 @@
 ﻿using FastFoodOperator.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace FastFoodOperator.Services
 {
@@ -7,7 +8,11 @@ namespace FastFoodOperator.Services
         public static void MapEndpoints(this WebApplication app)
         {
             app.MapGet("/", () => "Hello World!");
-            app.MapGet("/pizzas", (PizzaShopContext context) => TypedResults.Ok(context.Pizzas.ToList()));
+            app.MapGet("/pizzas", async (PizzaShopContext context) =>
+            {
+                var pizzas = await context.Pizzas.ToListAsync();
+                return TypedResults.Ok(pizzas);
+            });
         }
     }
 }
