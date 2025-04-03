@@ -82,6 +82,21 @@ namespace FastFoodOperator.Services
              };
             db.Drinks.AddRange(drinks);
             db.SaveChanges();
+
+
+            var extras = new List<Extra>
+            {
+                new Extra { Name = "Focaccia", Price = 40 },
+                new Extra { Name = "Brödpinnar", Price = 30 },
+                new Extra { Name = "Mozzarella Sticks", Price = 65 },
+                new Extra { Name = "Vitlöksbröd", Price = 35 },
+                new Extra { Name = "Pommes Frites", Price = 25 },
+                new Extra { Name = "Caesarsallad", Price = 85 },
+                new Extra { Name = "Pizza Salad", Price = 10 },
+                new Extra { Name = "Aioli", Price = 15 },
+            };
+            db.Extras.AddRange(extras);
+            db.SaveChanges();
         }
     }
 }

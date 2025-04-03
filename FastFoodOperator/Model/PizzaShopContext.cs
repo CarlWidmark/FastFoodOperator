@@ -25,6 +25,7 @@ namespace FastFoodOperator.Model
         public required string Name { get; set; }
         public decimal Price { get; set; }
         public required ICollection<PizzaIngredient> PizzaIngredients { get; set; }
+        public string? Extras { get; set; }
 
     }
     public class Ingredient
@@ -66,7 +67,8 @@ namespace FastFoodOperator.Model
         public List<Drink>? Drinks { get; set; }
         public List<Extra>? Extras { get; set; }
         public bool isComplete { get; set; }
-
+        public bool IsGlutenFree { get; set; }
+        public DateTime OrderDate { get; set; }
 
     }
 }
