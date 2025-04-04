@@ -65,7 +65,8 @@ namespace FastFoodOperator.Model
         public List<Pizza>? Pizzas { get; set; }
         public List<Drink>? Drinks { get; set; }
         public List<Extra>? Extras { get; set; }
-        public bool isComplete { get; set; }
+        public bool IsCooked { get; set; }
+        public bool IsPickedUp { get; set; }
 
 
     }

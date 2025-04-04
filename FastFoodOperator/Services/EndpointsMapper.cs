@@ -41,7 +41,8 @@ namespace FastFoodOperator.Services
                     Pizzas = pizzas,
                     Drinks = drinks,
                     Extras = extras,
-                    isComplete = false
+                    IsCooked = false,
+                    IsPickedUp = false
                 };
 
                 db.Orders.Add(order);
@@ -51,12 +52,39 @@ namespace FastFoodOperator.Services
             app.MapGet("/orders", async (PizzaShopContext db) =>
             {
                 var orders = await db.Orders
+                    .Where(o => !o.IsCooked & !o.IsPickedUp)
                     .Include(o => o.Pizzas)
                     .Include(o => o.Drinks)
                     .Include(o => o.Extras)
                     .ToListAsync();
 
                 return Results.Ok(orders);
+            });
+            app.MapPut("/orders/{orderId}/DoneInKitchen", async (int orderId, PizzaShopContext db) =>
+            {
+                var order = await db.Orders.FindAsync(orderId);
+                if (order == null)
+                {
+                    return Results.NotFound("Ordern hittades inte.");
+                }
+
+                order.IsCooked = true;
+                await db.SaveChangesAsync();
+                return Results.Ok(order);
+
+            });
+            app.MapPut("/orders/{orderId}/IsCollectedByCustomer", async (int orderId, PizzaShopContext db) =>
+            {
+                var order = await db.Orders.FindAsync(orderId);
+                if (order == null)
+                {
+                    return Results.NotFound("Ordern hittades inte.");
+                }
+
+                order.IsPickedUp = true;
+                await db.SaveChangesAsync();
+                return Results.Ok(order);
+
             });
 
         }
