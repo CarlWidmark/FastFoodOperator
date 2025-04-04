@@ -87,6 +87,20 @@ namespace FastFoodOperator.Services
                 await db.SaveChangesAsync();
                 return Results.Ok(order);
             });
+            app.MapGet("/pizza/{id}", async (int id, PizzaShopContext context) =>
+            {
+                var pizza = await context.Pizzas
+                    .Include(p => p.PizzaIngredients)
+                    .ThenInclude(pi => pi.Ingredient)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+
+                if (pizza == null)
+                {
+                    return Results.NotFound("Pizza not found.");
+                }
+
+                return Results.Ok(pizza.ToPizzaDTO());
+            });
 
         }
     }
