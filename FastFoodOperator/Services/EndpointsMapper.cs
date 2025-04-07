@@ -66,7 +66,7 @@ namespace FastFoodOperator.Services
                 var ordersDto = orders.Select(o => o.ToOrderDTO()).ToList();
                 return Results.Ok(ordersDto);
             });
-            app.MapGet("/orders/notcompleted", async (PizzaShopContext db) =>
+            app.MapGet("/orders/active", async (PizzaShopContext db) =>
             {
                 var orders = await db.Orders.
                 Where(o => !(o.IsCooked && o.IsPickedUp))
