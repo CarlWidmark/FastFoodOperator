@@ -50,9 +50,7 @@ namespace FastFoodOperator.Services
                     new PizzaIngredient { Ingredient = kebab },
                     new PizzaIngredient { Ingredient = isbergssallad },
                     new PizzaIngredient { Ingredient = lök},
-                    new PizzaIngredient { Ingredient = kebabsås},
-
-
+                    new PizzaIngredient { Ingredient = kebabsås}
                 }
                 },
                    new Pizza { Name = "Peperoni", Price = 115, PizzaIngredients = new List<PizzaIngredient>
