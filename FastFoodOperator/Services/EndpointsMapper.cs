@@ -39,30 +39,48 @@ namespace FastFoodOperator.Services
 
                 var order = new Order
                 {
-                    Pizzas = pizzas,
-                    Drinks = drinks,
-                    Extras = extras,
                     IsCooked = false,
-                    IsPickedUp = false
+                    IsPickedUp = false,
+                    OrderPizzas = pizzas.Select(p => new OrderPizza { Pizza = p, Quantity = 1 }).ToList(),
+                    OrderDrinks = drinks.Select(d => new OrderDrink { Drink = d, Quantity = 1 }).ToList(),
+                    OrderExtras = extras.Select(e => new OrderExtra { Extra = e, Quantity = 1 }).ToList()
                 };
 
                 db.Orders.Add(order);
                 await db.SaveChangesAsync();
                 return Results.Ok(order.ToCustomerOrder());
             });
-            app.MapGet("/orders", async (PizzaShopContext db) =>
+            app.MapGet("/orders/all", async (PizzaShopContext db) =>
             {
                 var orders = await db.Orders
-                     .Where(o => !(o.IsCooked && o.IsPickedUp))
-                     .Include(o => o.Pizzas)
-                     .ThenInclude(p => p.PizzaIngredients)
-                     .ThenInclude(pi => pi.Ingredient)
-                     .Include(o => o.Drinks)
-                     .Include(o => o.Extras)
+                     .Include(o => o.OrderPizzas)
+                         .ThenInclude(op => op.Pizza)
+                         .ThenInclude(p => p.PizzaIngredients)
+                         .ThenInclude(pi => pi.Ingredient)
+                     .Include(o => o.OrderDrinks)
+                         .ThenInclude(od => od.Drink)
+                     .Include(o => o.OrderExtras)
+                         .ThenInclude(oe => oe.Extra)
                      .ToListAsync();
 
                 var ordersDto = orders.Select(o => o.ToOrderDTO()).ToList();
+                return Results.Ok(ordersDto);
+            });
+            app.MapGet("/orders/notcompleted", async (PizzaShopContext db) =>
+            {
+                var orders = await db.Orders.
+                Where(o => !(o.IsCooked && o.IsPickedUp))
+                     .Include(o => o.OrderPizzas)
+                         .ThenInclude(op => op.Pizza)
+                         .ThenInclude(p => p.PizzaIngredients)
+                         .ThenInclude(pi => pi.Ingredient)
+                     .Include(o => o.OrderDrinks)
+                         .ThenInclude(od => od.Drink)
+                     .Include(o => o.OrderExtras)
+                         .ThenInclude(oe => oe.Extra)
+                     .ToListAsync();
 
+                var ordersDto = orders.Select(o => o.ToOrderDTO()).ToList();
                 return Results.Ok(ordersDto);
             });
             app.MapPut("/orders/{orderId}/DoneInKitchen", async (int orderId, PizzaShopContext db) =>
