@@ -45,6 +45,12 @@ namespace FastFoodOperator
             }
             app.MapEndpoints();
 
+            app.MapPost("/receipt", (decimal totalPrice) =>
+            {
+                string receipt = TaxCalculator.FormatReceipt(totalPrice);
+                return Results.Ok(receipt);
+            });
+
 
 
             app.Run();
