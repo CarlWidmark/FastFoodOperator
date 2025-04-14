@@ -37,6 +37,11 @@ namespace FastFoodOperator.Services
                 var drinks = request.DrinkIds.SelectMany(id => drinksFromDb.Where(d => d.Id == id)).ToList();
                 var extras = (request.ExtraIds ?? new()).SelectMany(id => extrasFromDb.Where(e => e.Id == id)).ToList();
 
+                var totalPrice = pizzas.Sum(p => p.Price) +
+                                 drinks.Sum(d => d.Price) +
+                                 extras.Sum(d => d.Price);
+
+
                 var order = new Order
                 {
                     Pizzas = pizzas,
@@ -47,6 +52,8 @@ namespace FastFoodOperator.Services
                 };
 
                 db.Orders.Add(order);
+                await db.SaveChangesAsync();
+                order.TotalPrice = totalPrice;
                 await db.SaveChangesAsync();
                 return Results.Ok(order.ToCustomerOrder());
             });

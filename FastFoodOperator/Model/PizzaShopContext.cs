@@ -67,7 +67,7 @@ namespace FastFoodOperator.Model
         public List<Extra>? Extras { get; set; }
         public bool IsCooked { get; set; }
         public bool IsPickedUp { get; set; }
-
+        public decimal TotalPrice { get; set; }
 
     }
 }
