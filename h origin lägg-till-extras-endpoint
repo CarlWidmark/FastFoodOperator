@@ -1,0 +1,84 @@
+[33mcommit d25a68f7c15117dd957f05500b8325d0c2691686[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mlägg-till-extras-endpoint[m[33m, [m[1;31morigin/lägg-till-extras-endpoint[m[33m)[m
+Author: zully76 <zuleima.alexandra.martinez@hotmail.com>
+Date:   Mon Apr 14 17:45:44 2025 +0200
+
+    Lagt till fältet IsOptional i klassen Extra och lagt till endpoint för att hämta extras
+
+[33mcommit 9dcb968a991758041ab2be1e08bd136c6c2241cc[m[33m ([m[1;31morigin/feature/total-price-update[m[33m, [m[1;31morigin/Dev[m[33m, [m[1;32mfeature/total-price-update[m[33m, [m[1;32mDev[m[33m)[m
+Author: KevinHoler <holer.kevin@gmail.com>
+Date:   Fri Apr 4 14:18:08 2025 +0200
+
+    added endpoint for pizza id
+
+[33mcommit e0d588127797ca8014cb80fd597a789fe4d6a0c3[m
+Author: CarlWidmark <Carl.widmark@iths.se>
+Date:   Fri Apr 4 13:55:57 2025 +0200
+
+    Fixat DTO's och Endpoints
+
+[33mcommit d4090ad9557fcc447c0c0857cc9950f028902259[m
+Author: CarlWidmark <Carl.widmark@iths.se>
+Date:   Fri Apr 4 11:02:54 2025 +0200
+
+    La till Endpoints för att ändra orderstatus
+
+[33mcommit 9f2fc573ea591d5373ef36c90cce2a809006cc37[m
+Author: CarlWidmark <Carl.widmark@iths.se>
+Date:   Mon Mar 31 15:14:28 2025 +0200
+
+    Fixade Endpoint till post orders
+
+[33mcommit 85196207058e13a8438ad4173d08dcc2617fb10c[m
+Merge: c0fb5bb 9513f3e
+Author: CarlWidmark <Carl.widmark@iths.se>
+Date:   Mon Mar 31 14:52:15 2025 +0200
+
+    Merge branch 'Dev' of https://github.com/CarlWidmark/FastFoodOperator into Dev
+
+[33mcommit c0fb5bb411128ab7ae13c7ecc38cfffbec9c62ea[m
+Author: CarlWidmark <Carl.widmark@iths.se>
+Date:   Mon Mar 31 14:51:05 2025 +0200
+
+    La till order och en endpoint
+
+[33mcommit 9513f3efcb4fe077a74c5a5964f2f2ad387cb685[m
+Author: KevinHoler <holer.kevin@gmail.com>
+Date:   Mon Mar 31 14:29:14 2025 +0200
+
+    added connection to frontend
+
+[33mcommit 9981d773f1dd8a30e51e0622a444f40e56b6a65f[m
+Author: CarlWidmark <Carl.widmark@iths.se>
+Date:   Mon Mar 31 14:18:47 2025 +0200
+
+    La till dryck i databasen + extras, ej gjort kod till den dock.
+
+[33mcommit 784fa42eb93a7a747a5bf5328aa0e04c1195edf0[m
+Author: CarlWidmark <Carl.widmark@iths.se>
+Date:   Mon Mar 31 13:15:10 2025 +0200
+
+    Fixat struktur och visning av pizzor
+
+[33mcommit 89927daa6c967aa9516aab5643dee01156259ea5[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: CarlWidmark <Carl.widmark@iths.se>
+Date:   Fri Mar 28 10:27:01 2025 +0100
+
+    added test
+
+[33mcommit ef6efda6ed6b3ca9ec0146320ccf1f558df68862[m
+Author: Lukasmalki <lukasmalki@hotmail.com>
+Date:   Fri Mar 28 10:18:20 2025 +0100
+
+    added price (test)
+
+[33mcommit 0cd146f8117a0b737b648f381be69c7eb8ca88c5[m
+Author: CarlWidmark <Carl.widmark@iths.se>
+Date:   Fri Mar 28 10:03:57 2025 +0100
+
+    Add project files.
+
+[33mcommit 7d888035c48e5564a0a65554cd0cd93edb5950d8[m
+Author: CarlWidmark <Carl.widmark@iths.se>
+Date:   Fri Mar 28 10:03:56 2025 +0100
+
+    Add .gitattributes and .gitignore.
