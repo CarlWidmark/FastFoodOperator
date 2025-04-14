@@ -102,7 +102,79 @@ namespace FastFoodOperator.Services
                 return Results.Ok(pizza.ToPizzaDTO());
             });
 
+            app.MapGet("/receipt/{orderId}", async (int orderId, PizzaShopContext db) =>
+            {
+                var order = await db.Orders
+                    .Include(o => o.Pizzas)
+                    .ThenInclude(p => p.PizzaIngredients)
+                    .ThenInclude(pi => pi.Ingredient)
+                    .Include(o => o.Drinks)
+                    .Include(o => o.Extras)
+                    .FirstOrDefaultAsync(o => o.Id == orderId);
+
+                if (order == null)
+                {
+                    return Results.NotFound("Order not found.");
+                }
+
+                var receipt = new ReceiptDTO
+                {
+                    OrderNumber = order.Id,
+                    TotalPrice = (order.Pizzas ?? new List<Pizza>()).Sum(p => p.Price) +
+                                 (order.Drinks ?? new List<Drink>()).Sum(d => d.Price) +
+                                 (order.Extras ?? new List<Extra>()).Sum(e => e.Price)
+                };
+
+               
+                foreach (var pizza in order.Pizzas ?? new List<Pizza>())
+                {
+                    receipt.Items.Add(new ReceiptDTO.ReceiptItemDTO
+                    {
+                        Name = pizza.Name,
+                        Price = pizza.Price,
+                        Description = string.Join(", ", pizza.PizzaIngredients.Select(pi => pi.Ingredient.Name))
+                    });
+                }
+
+               
+                foreach (var drink in order.Drinks ?? new List<Drink>())
+                {
+                    receipt.Items.Add(new ReceiptDTO.ReceiptItemDTO
+                    {
+                        Name = drink.Name,
+                        Price = drink.Price,
+                        Description = $"{drink.Size} {drink.Unit}"
+                    });
+                }
+
+                
+                foreach (var extra in order.Extras ?? new List<Extra>())
+                {
+                    receipt.Items.Add(new ReceiptDTO.ReceiptItemDTO
+                    {
+                        Name = extra.Name,
+                        Price = extra.Price,
+                        Description = "Extra topping"
+                    });
+                }
+
+                return Results.Ok(receipt);
+            });
         }
     }
-
 }
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+
