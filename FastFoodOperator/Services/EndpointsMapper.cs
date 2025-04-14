@@ -15,6 +15,17 @@ namespace FastFoodOperator.Services
              .Select(p => p.ToPizzaDTO())
              .ToList()));
             app.MapGet("/drinks", (PizzaShopContext context) => TypedResults.Ok(context.Drinks));
+
+            app.MapGet("/extras", (PizzaShopContext context) =>
+             TypedResults.Ok(context.Extras.Select(extra => new
+        {
+             extra.Id,
+             extra.Name,
+             extra.Price,
+             extra.IsOptional  
+        })  .ToList()));
+
+
             app.MapPost("/orders", async (PizzaShopContext db, OrderRequest request) =>
             {
                 var pizzasFromDb = await db.Pizzas
