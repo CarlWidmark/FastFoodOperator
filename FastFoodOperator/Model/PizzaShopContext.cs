@@ -25,6 +25,7 @@ namespace FastFoodOperator.Model
                 .HasKey(pi => new { pi.PizzaId, pi.IngredientId });
         }
     }
+
     public class Pizza
     {
         public int Id { get; set; }
@@ -32,6 +33,7 @@ namespace FastFoodOperator.Model
         public decimal Price { get; set; }
         public ICollection<PizzaIngredient> PizzaIngredients { get; set; } = new List<PizzaIngredient>();
     }
+
     public class Ingredient
     {
         public int Id { get; set; }
@@ -39,6 +41,7 @@ namespace FastFoodOperator.Model
         public decimal Price { get; set; }
         public ICollection<PizzaIngredient>? PizzaIngredients { get; set; } = new List<PizzaIngredient>();
     }
+
     public class PizzaIngredient
     {
         public int PizzaId { get; set; }
@@ -46,6 +49,7 @@ namespace FastFoodOperator.Model
         public int IngredientId { get; set; }
         public Ingredient? Ingredient { get; set; }
     }
+
     public class Drink
     {
         public int Id { get; set; }
@@ -54,6 +58,7 @@ namespace FastFoodOperator.Model
         public required decimal Size { get; set; }
         public decimal Price { get; set; }
     }
+
     public class Extra
     {
         public int Id { get; set; }
@@ -61,6 +66,8 @@ namespace FastFoodOperator.Model
         public required string Info { get; set; }
         public decimal Price { get; set; }
     }
+
+
     public class OrderPizza
     {
         public int Id { get; set; }
