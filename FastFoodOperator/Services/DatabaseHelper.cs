@@ -15,10 +15,10 @@ namespace FastFoodOperator.Services
             var peperoni = new Ingredient { Name = "Peperoni", Price = 10 };
             var kebab = new Ingredient { Name = "Kebabkött", Price = 15 };
             var kebabsås = new Ingredient { Name = "Kebabsås", Price = 15 };
-            var champinjoner = new Ingredient { Name = "Champinjoner" };
-            var oliver = new Ingredient { Name = "Oliver" };
-            var cheddar = new Ingredient { Name = "Cheddar" };
-            var parmesan = new Ingredient { Name = "Parmesan" };
+            var champinjoner = new Ingredient { Name = "Champinjoner", Price = 10 };
+            var oliver = new Ingredient { Name = "Oliver", Price = 10 };
+            var cheddar = new Ingredient { Name = "Cheddar", Price = 10 };
+            var parmesan = new Ingredient { Name = "Parmesan", Price = 10 };
             var bacon = new Ingredient { Name = "Bacon" };
             var tuna = new Ingredient { Name = "Tonfisk" };
             var shrimp = new Ingredient { Name = "Räkor" };
@@ -135,6 +135,19 @@ namespace FastFoodOperator.Services
 
              };
             db.Drinks.AddRange(drinks);
+            db.SaveChanges();
+
+            var extras = new List<Extra>
+            {
+                new Extra { Name = "Pizzasallad", Info= "Vitkålssallad med vinägrett.", Price= 15},
+                new Extra { Name = "Vitlöksbröd", Info= "Bröd med vitlök", Price= 25},
+                new Extra { Name = "Mozzarella sticks 4 st", Info= "Friterade mozzarellastavar.", Price= 60},
+                new Extra { Name = "Mozzarella sticks 8 st", Info= "Friterade mozzarellastavar.", Price= 90},
+                new Extra { Name = "Pommes frites", Info= "Pommes Frittes- tallrik", Price= 35},
+
+
+            };
+            db.Extras.AddRange(extras);
             db.SaveChanges();
         }
     }

@@ -63,6 +63,7 @@ namespace FastFoodOperator.Model
     {
         public int Id { get; set; }
         public required string Name { get; set; }
+        public required string Info { get; set; }
         public decimal Price { get; set; }
     }
 

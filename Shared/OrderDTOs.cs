@@ -9,6 +9,7 @@
         public List<DrinkDTO> Drinks { get; set; } = new();
         public List<string> Extras { get; set; } = new();
         public string? Notes { get; set; }
+
     }
     public class OrderForCustomerDTO
     {

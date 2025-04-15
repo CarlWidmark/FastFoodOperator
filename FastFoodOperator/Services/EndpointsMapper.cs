@@ -15,6 +15,7 @@ namespace FastFoodOperator.Services
              .Select(p => p.ToPizzaDTO())
              .ToList()));
             app.MapGet("/drinks", (PizzaShopContext context) => TypedResults.Ok(context.Drinks));
+            app.MapGet("/Extras", (PizzaShopContext context) => TypedResults.Ok(context.Extras));
             app.MapPost("/orders", async (PizzaShopContext db, OrderRequest request) =>
             {
                 var pizzasFromDb = await db.Pizzas
@@ -50,7 +51,7 @@ namespace FastFoodOperator.Services
                 await db.SaveChangesAsync();
                 return Results.Ok(order.ToCustomerOrder());
             });
-            app.MapGet("/orders/all", async (PizzaShopContext db) =>
+            app.MapGet("/orders/allOrders", async (PizzaShopContext db) =>
             {
                 var orders = await db.Orders
                      .Include(o => o.OrderPizzas)
@@ -66,7 +67,7 @@ namespace FastFoodOperator.Services
                 var ordersDto = orders.Select(o => o.ToOrderDTO()).ToList();
                 return Results.Ok(ordersDto);
             });
-            app.MapGet("/orders/active", async (PizzaShopContext db) =>
+            app.MapGet("/orders/notDone", async (PizzaShopContext db) =>
             {
                 var orders = await db.Orders.
                 Where(o => !(o.IsCooked && o.IsPickedUp))
@@ -79,6 +80,23 @@ namespace FastFoodOperator.Services
                      .Include(o => o.OrderExtras)
                          .ThenInclude(oe => oe.Extra)
                      .ToListAsync();
+
+                var ordersDto = orders.Select(o => o.ToOrderDTO()).ToList();
+                return Results.Ok(ordersDto);
+            });
+            app.MapGet("/orders/isDoneAndPickedUp", async (PizzaShopContext db) =>
+            {
+                var orders = await db.Orders
+                    .Where(o => o.IsCooked && o.IsPickedUp)
+                    .Include(o => o.OrderPizzas)
+                        .ThenInclude(op => op.Pizza)
+                            .ThenInclude(p => p.PizzaIngredients)
+                                .ThenInclude(pi => pi.Ingredient)
+                    .Include(o => o.OrderDrinks)
+                        .ThenInclude(od => od.Drink)
+                    .Include(o => o.OrderExtras)
+                        .ThenInclude(oe => oe.Extra)
+                    .ToListAsync();
 
                 var ordersDto = orders.Select(o => o.ToOrderDTO()).ToList();
                 return Results.Ok(ordersDto);
