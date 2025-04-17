@@ -40,6 +40,7 @@ namespace FastFoodOperator.Services
 
                 var order = new Order
                 {
+                    IsStartedInKitchen = false,
                     IsCooked = false,
                     IsPickedUp = false,
                     OrderPizzas = pizzas.Select(p => new OrderPizza { Pizza = p, Quantity = 1 }).ToList(),
@@ -100,6 +101,17 @@ namespace FastFoodOperator.Services
 
                 var ordersDto = orders.Select(o => o.ToOrderDTO()).ToList();
                 return Results.Ok(ordersDto);
+            });
+            app.MapPut("/orders/{orderId}/IsStartedInKitchen", async (int orderId, PizzaShopContext db) =>
+            {
+                var order = await db.Orders.FindAsync(orderId);
+                if (order == null)
+                {
+                    return Results.NotFound("Ordern hittades inte.");
+                }
+                order.IsStartedInKitchen = true;
+                await db.SaveChangesAsync();
+                return Results.Ok(order);
             });
             app.MapPut("/orders/{orderId}/DoneInKitchen", async (int orderId, PizzaShopContext db) =>
             {

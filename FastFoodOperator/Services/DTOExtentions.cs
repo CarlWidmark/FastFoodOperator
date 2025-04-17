@@ -45,6 +45,7 @@ namespace FastFoodOperator.Services
             return new OrderDTOs
             {
                 Id = order.Id,
+                IsStartedInKitchen = order.IsStartedInKitchen,
                 IsCooked = order.IsCooked,
                 IsPickedUp = order.IsPickedUp,
                 Pizzas = order.OrderPizzas.Select(op => op.Pizza.ToShowKitchenPizzaDTO()).ToList(),
