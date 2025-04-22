@@ -51,7 +51,8 @@ namespace FastFoodOperator.Services
                 Pizzas = order.OrderPizzas.Select(op => op.Pizza.ToShowKitchenPizzaDTO()).ToList(),
                 Drinks = order.OrderDrinks.Select(od => od.Drink.ToDrinkDTO()).ToList(),
                 Extras = order.OrderExtras.Select(oe => oe.Extra.Name).ToList(),
-                Notes = order.Notes
+                Notes = order.Notes,
+                EatHere = order.EatHere
             };
         }
 
@@ -74,7 +75,8 @@ namespace FastFoodOperator.Services
                     (order.OrderDrinks ?? new List<OrderDrink>())
                     .Sum(od => od.Drink.Price * od.Quantity) +
                     (order.OrderExtras ?? new List<OrderExtra>())
-                    .Sum(oe => oe.Extra.Price * oe.Quantity)
+                    .Sum(oe => oe.Extra.Price * oe.Quantity),
+                EatHere = order.EatHere
             };
         }
 

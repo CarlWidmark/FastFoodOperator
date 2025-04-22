@@ -37,6 +37,7 @@ public static class EndpointsMapper
                 IsStartedInKitchen = false,
                 IsCooked = false,
                 IsPickedUp = false,
+                EatHere = request.EatHere,
                 OrderPizzas = pizzas.Select(p => new OrderPizza { Pizza = p, Quantity = 1 }).ToList(),
                 OrderDrinks = drinks.Select(d => new OrderDrink { Drink = d, Quantity = 1 }).ToList(),
                 OrderExtras = extras.Select(e => new OrderExtra { Extra = e, Quantity = 1 }).ToList()
@@ -101,6 +102,20 @@ public static class EndpointsMapper
             await BroadcastOrder(order, webSocketConnections);
             return Results.Ok(order.ToOrderDTO());
         });
+        app.MapGet("/pizza/{id}", async (int id, PizzaShopContext context) =>
+        {
+            var pizza = await context.Pizzas
+                .Include(p => p.PizzaIngredients)
+                .ThenInclude(pi => pi.Ingredient)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (pizza == null)
+            {
+                return Results.NotFound("Pizza not found.");
+            }
+
+            return Results.Ok(pizza.ToPizzaDTO());
+        });
     }
 
     private static async Task BroadcastOrder(Order order, List<WebSocket> clients)
@@ -131,4 +146,5 @@ public static class EndpointsMapper
             .Include(o => o.OrderDrinks).ThenInclude(od => od.Drink)
             .Include(o => o.OrderExtras).ThenInclude(oe => oe.Extra);
     }
+
 }
