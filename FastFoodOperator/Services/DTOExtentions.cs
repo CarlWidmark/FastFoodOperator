@@ -50,7 +50,7 @@ namespace FastFoodOperator.Services
                 IsPickedUp = order.IsPickedUp,
                 Pizzas = order.OrderPizzas.Select(op => op.Pizza.ToShowKitchenPizzaDTO()).ToList(),
                 Drinks = order.OrderDrinks.Select(od => od.Drink.ToDrinkDTO()).ToList(),
-                Extras = order.OrderExtras.Select(oe => oe.Extra.Name).ToList(),
+                Extras = order.OrderExtras.Select(oe => oe.Extra.ToExtraDTO()).ToList(),
                 Notes = order.Notes,
                 EatHere = order.EatHere
             };
@@ -68,7 +68,7 @@ namespace FastFoodOperator.Services
                     .Select(od => od.Drink.ToDrinkDTO())
                     .ToList(),
                 Extras = (order.OrderExtras ?? new List<OrderExtra>())
-                    .Select(oe => oe.Extra.Name)
+                    .Select(oe => oe.Extra.ToExtraDTO())
                     .ToList(),
                 TotalPrice = (order.OrderPizzas ?? new List<OrderPizza>())
                     .Sum(op => op.Pizza.Price * op.Quantity) +
@@ -90,7 +90,15 @@ namespace FastFoodOperator.Services
                 Price = drink.Price
             };
         }
-
+        public static ExtraDTO ToExtraDTO(this Extra extra)
+        {
+            return new ExtraDTO
+            {
+                Name = extra.Name,
+                Info = extra.Info,
+                Price = extra.Price
+            };
+        }
         public static PizzaInKitchenDTO ToShowKitchenPizzaDTO(this Pizza pizza)
         {
             return new PizzaInKitchenDTO

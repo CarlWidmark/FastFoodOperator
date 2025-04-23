@@ -30,7 +30,7 @@ public static class EndpointsMapper
                 .Where(d => request.DrinkIds.Contains(d.Id)).ToListAsync();
 
             var extras = await db.Extras
-                .Where(e => (request.ExtraIds ?? new()).Contains(e.Id)).ToListAsync();
+                .Where(e => request.ExtraIds.Contains(e.Id)).ToListAsync();
 
             var order = new Order
             {
@@ -116,6 +116,23 @@ public static class EndpointsMapper
 
             return Results.Ok(pizza.ToPizzaDTO());
         });
+        app.MapGet("/orders/{orderId}", async (int orderId, PizzaShopContext db) =>
+        {
+            // Hämta den specifika ordern med alla relaterade data
+            var order = await db.Orders
+                .IncludeAll() // Använda din helper-metod för att hämta alla relaterade entiteter
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            // Om ordern inte finns, returnera ett 404-fel
+            if (order == null)
+            {
+                return Results.NotFound("Ordern hittades inte.");
+            }
+
+            // Om ordern finns, returnera den som en DTO för kunden
+            return Results.Ok(order.ToCustomerOrder());
+        });
+
     }
 
     private static async Task BroadcastOrder(Order order, List<WebSocket> clients)
