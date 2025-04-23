@@ -130,9 +130,6 @@ namespace FastFoodOperator.Services
                 new Drink { Name = "Sprite", Size = 50, Unit = "Cl", Price = 22 },
                 new Drink { Name = "Loka", Size = 50, Unit = "Cl", Price = 15 },
                 new Drink { Name = "Ramlösa", Size = 50, Unit = "Cl", Price = 15 },
-                new Drink { Name = "Apelsinjuice", Size = 25, Unit = "Cl", Price = 28 },
-                new Drink { Name = "Äppeljuice", Size = 25, Unit = "Cl", Price = 28 },
-
              };
             db.Drinks.AddRange(drinks);
             db.SaveChanges();
