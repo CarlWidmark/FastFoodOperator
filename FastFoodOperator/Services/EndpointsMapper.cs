@@ -15,7 +15,17 @@ namespace FastFoodOperator.Services
              .Select(p => p.ToPizzaDTO())
              .ToList()));
             app.MapGet("/drinks", (PizzaShopContext context) => TypedResults.Ok(context.Drinks));
-            app.MapGet("/Extras", (PizzaShopContext context) => TypedResults.Ok(context.Extras));
+
+            app.MapGet("/extras", (PizzaShopContext context) =>
+             TypedResults.Ok(context.Extras.Select(extra => new
+        {
+             extra.Id,
+             extra.Name,
+             extra.Price,
+             extra.IsOptional  
+        })  .ToList()));
+
+
             app.MapPost("/orders", async (PizzaShopContext db, OrderRequest request) =>
             {
                 var pizzasFromDb = await db.Pizzas
@@ -40,7 +50,6 @@ namespace FastFoodOperator.Services
 
                 var order = new Order
                 {
-                    IsStartedInKitchen = false,
                     IsCooked = false,
                     IsPickedUp = false,
                     OrderPizzas = pizzas.Select(p => new OrderPizza { Pizza = p, Quantity = 1 }).ToList(),
@@ -102,17 +111,6 @@ namespace FastFoodOperator.Services
                 var ordersDto = orders.Select(o => o.ToOrderDTO()).ToList();
                 return Results.Ok(ordersDto);
             });
-            app.MapPut("/orders/{orderId}/IsStartedInKitchen", async (int orderId, PizzaShopContext db) =>
-            {
-                var order = await db.Orders.FindAsync(orderId);
-                if (order == null)
-                {
-                    return Results.NotFound("Ordern hittades inte.");
-                }
-                order.IsStartedInKitchen = true;
-                await db.SaveChangesAsync();
-                return Results.Ok(order);
-            });
             app.MapPut("/orders/{orderId}/DoneInKitchen", async (int orderId, PizzaShopContext db) =>
             {
                 var order = await db.Orders.FindAsync(orderId);
@@ -135,17 +133,6 @@ namespace FastFoodOperator.Services
                 await db.SaveChangesAsync();
                 return Results.Ok(order);
             });
-            app.MapGet("/pizza/{id}", async (int id, PizzaShopContext context) =>
-            {
-                var pizza = await context.Pizzas
-                    .Include(p => p.PizzaIngredients)
-                    .ThenInclude(pi => pi.Ingredient)
-                    .FirstOrDefaultAsync(p => p.Id == id);
-
-                if (pizza == null)
-                {
-                    return Results.NotFound("Pizza not found.");
-                }
 
                 return Results.Ok(pizza.ToPizzaDTO());
             });
