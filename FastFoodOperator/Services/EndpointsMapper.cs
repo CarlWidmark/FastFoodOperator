@@ -16,10 +16,8 @@ public static class EndpointsMapper
                 .ThenInclude(pi => pi.Ingredient)
                 .Select(p => p.ToPizzaDTO())
                 .ToList()));
-
         app.MapGet("/drinks", (PizzaShopContext context) => TypedResults.Ok(context.Drinks));
         app.MapGet("/extras", (PizzaShopContext context) => TypedResults.Ok(context.Extras));
-
         app.MapPost("/orders", async (PizzaShopContext db, OrderRequest request) =>
         {
             var pizzas = await db.Pizzas
@@ -50,14 +48,11 @@ public static class EndpointsMapper
 
             return Results.Ok(order.ToCustomerOrder());
         });
-
-
         app.MapGet("/orders/allOrders", async (PizzaShopContext db) =>
         {
             var orders = await LoadOrders(db);
             return Results.Ok(orders.Select(o => o.ToOrderDTO()));
         });
-
         app.MapPut("/orders/{orderId}/IsStartedInKitchen", async (int orderId, PizzaShopContext db) =>
         {
             var order = await db.Orders
@@ -72,7 +67,6 @@ public static class EndpointsMapper
             await BroadcastOrder(order, webSocketConnections);
             return Results.Ok(order.ToOrderDTO());
         });
-
         app.MapPut("/orders/{orderId}/DoneInKitchen", async (int orderId, PizzaShopContext db) =>
         {
             var order = await db.Orders
@@ -87,7 +81,6 @@ public static class EndpointsMapper
             await BroadcastOrder(order, webSocketConnections);
             return Results.Ok(order.ToOrderDTO());
         });
-
         app.MapPut("/orders/{orderId}/IsCollectedByCustomer", async (int orderId, PizzaShopContext db) =>
         {
             var order = await db.Orders
@@ -118,20 +111,31 @@ public static class EndpointsMapper
         });
         app.MapGet("/orders/{orderId}", async (int orderId, PizzaShopContext db) =>
         {
-            // Hämta den specifika ordern med alla relaterade data
             var order = await db.Orders
-                .IncludeAll() // Använda din helper-metod för att hämta alla relaterade entiteter
+                .IncludeAll()
                 .FirstOrDefaultAsync(o => o.Id == orderId);
-
-            // Om ordern inte finns, returnera ett 404-fel
             if (order == null)
             {
                 return Results.NotFound("Ordern hittades inte.");
             }
-
-            // Om ordern finns, returnera den som en DTO för kunden
             return Results.Ok(order.ToCustomerOrder());
         });
+        app.MapGet("/ingredients", (PizzaShopContext context) =>
+            TypedResults.Ok(context.Ingredients.Select(i => i.ToIngredientDto()).ToList()));
+        app.MapGet("/ingredients/{id}", async (int id, PizzaShopContext context) =>
+        {
+            var ingredient = await context.Ingredients
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (ingredient == null)
+            {
+                return Results.NotFound("Ingredient not found.");
+            }
+
+            return Results.Ok(ingredient.ToIngredientDto());
+        });
+
+
 
     }
 
@@ -149,7 +153,6 @@ public static class EndpointsMapper
             }
         }
     }
-
     private static async Task<List<Order>> LoadOrders(PizzaShopContext db)
     {
         return await db.Orders.IncludeAll().ToListAsync();
