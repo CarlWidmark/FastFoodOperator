@@ -115,6 +115,7 @@ namespace FastFoodOperator.Model
         public bool IsCooked { get; set; }
         public bool IsPickedUp { get; set; }
         public string? Notes { get; set; }
+        public bool EatHere { get; set; }
     }
 
 }
