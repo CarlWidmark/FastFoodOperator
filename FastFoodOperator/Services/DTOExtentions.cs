@@ -111,6 +111,18 @@ namespace FastFoodOperator.Services
             };
         }
 
+        public static IngredientDTO ToIngredientDto(this Ingredient ingredient)
+        {
+            return new IngredientDTO()
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                Price = ingredient.Price
+            };
+        }
+
+
+
         public class OrderRequest
         {
             public List<int> PizzaIds { get; set; } = new();

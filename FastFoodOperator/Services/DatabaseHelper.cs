@@ -7,9 +7,9 @@ namespace FastFoodOperator.Services
         public static void PopulateDatabase(PizzaShopContext db)
         {
             var tomatsås = new Ingredient { Name = "Tomatsås", Price = 5 };
-            var ost = new Ingredient { Name = "Ost", Price = 5 };
+            var ost = new Ingredient { Name = "Ost", Price = 10 };
             var skinka = new Ingredient { Name = "Skinka", Price = 10 };
-            var annanas = new Ingredient { Name = "Annanas", Price = 5 };
+            var annanas = new Ingredient { Name = "Annanas", Price = 10 };
             var lök = new Ingredient { Name = "Lök", Price = 5 };
             var isbergssallad = new Ingredient { Name = "Isbergssallad", Price = 5 };
             var peperoni = new Ingredient { Name = "Peperoni", Price = 10 };
@@ -19,16 +19,16 @@ namespace FastFoodOperator.Services
             var oliver = new Ingredient { Name = "Oliver", Price = 10 };
             var cheddar = new Ingredient { Name = "Cheddar", Price = 10 };
             var parmesan = new Ingredient { Name = "Parmesan", Price = 10 };
-            var bacon = new Ingredient { Name = "Bacon" };
-            var tuna = new Ingredient { Name = "Tonfisk" };
-            var shrimp = new Ingredient { Name = "Räkor" };
-            var yogurtSauce = new Ingredient { Name = "Yoghurt sås" };
-            var tomato = new Ingredient { Name = "Tomat" };
-            var redOnion = new Ingredient { Name = "Röd lök" };
-            var peppers = new Ingredient { Name = "Paprika" };
-            var chicken = new Ingredient { Name = "Kyckling" };
-            var bbqSauce = new Ingredient { Name = "BBQ sås" };
-            var prosciutto = new Ingredient { Name = "Prosciutto" };
+            var bacon = new Ingredient { Name = "Bacon", Price = 10 };
+            var tuna = new Ingredient { Name = "Tonfisk", Price = 10 };
+            var shrimp = new Ingredient { Name = "Räkor", Price = 10 };
+            var yogurtSauce = new Ingredient { Name = "Yoghurt sås", Price = 10 };
+            var tomato = new Ingredient { Name = "Tomat", Price = 5 };
+            var redOnion = new Ingredient { Name = "Röd lök", Price = 5 };
+            var peppers = new Ingredient { Name = "Paprika", Price = 5 };
+            var chicken = new Ingredient { Name = "Kyckling", Price = 10 };
+            var bbqSauce = new Ingredient { Name = "BBQ sås", Price = 10 };
+            var prosciutto = new Ingredient { Name = "Prosciutto", Price = 10 };
 
             db.Ingredients.AddRange(tomatsås, ost, skinka, annanas, lök, isbergssallad, peperoni, kebab);
             db.SaveChanges();
