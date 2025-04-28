@@ -114,7 +114,9 @@ namespace FastFoodOperator.Model
         public List<OrderExtra> OrderExtras { get; set; } = new();
         public bool IsCooked { get; set; }
         public bool IsPickedUp { get; set; }
+        public bool IsStartedInKitchen { get; set; }
         public string? Notes { get; set; }
+        public bool EatHere { get; set; }
     }
 
 }
