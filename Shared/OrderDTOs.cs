@@ -16,11 +16,13 @@
     public class OrderForCustomerDTO
     {
         public int OrderNr { get; set; }
+        public DateTime TimeOfOrder { get; set; }
         public List<CustomerPizzaDTO> Pizzas { get; set; } = new();
         public List<DrinkDTO> Drinks { get; set; } = new();
         public List<ExtraDTO> Extras { get; set; } = new();
         public decimal TotalPrice { get; set; }
-        public bool EatHere { get;set; }
+        public bool EatHere { get; set; }
+        public decimal Price { get; set; }
 
     }
 }

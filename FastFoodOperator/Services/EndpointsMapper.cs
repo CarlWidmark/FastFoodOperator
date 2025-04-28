@@ -38,16 +38,21 @@ public static class EndpointsMapper
                 EatHere = request.EatHere,
                 OrderPizzas = pizzas.Select(p => new OrderPizza { Pizza = p, Quantity = 1 }).ToList(),
                 OrderDrinks = drinks.Select(d => new OrderDrink { Drink = d, Quantity = 1 }).ToList(),
-                OrderExtras = extras.Select(e => new OrderExtra { Extra = e, Quantity = 1 }).ToList()
+                OrderExtras = extras.Select(e => new OrderExtra { Extra = e, Quantity = 1 }).ToList(),
+
             };
+
+
+            order.GetTotalPrice();
 
             db.Orders.Add(order);
             await db.SaveChangesAsync();
 
-            await BroadcastOrder(order, webSocketConnections); // Skicka den nya ordern till frontend via WebSocket
+            await BroadcastOrder(order, webSocketConnections);
 
             return Results.Ok(order.ToCustomerOrder());
         });
+
         app.MapGet("/orders/allOrders", async (PizzaShopContext db) =>
         {
             var orders = await LoadOrders(db);

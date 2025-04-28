@@ -40,6 +40,23 @@ namespace FastFoodOperator.Services
             };
         }
 
+        public static decimal GetTotalPrice(this Order order)
+        {
+            order.Price = (order.OrderPizzas ?? new List<OrderPizza>())
+                          .Sum(op =>
+                              (op.Pizza?.Price ?? 0) * op.Quantity +
+                              (op.CustomIngredients?.Sum(ci => ci.Ingredient.Price) ?? 0) * op.Quantity
+                          )
+                          +
+                          (order.OrderDrinks ?? new List<OrderDrink>())
+                          .Sum(od => od.Drink.Price * od.Quantity) +
+                          (order.OrderExtras ?? new List<OrderExtra>())
+                          .Sum(oe => oe.Extra.Price * oe.Quantity);
+
+            return order.Price;
+        }
+
+
         public static OrderDTOs ToOrderDTO(this Order order)
         {
             return new OrderDTOs
@@ -55,14 +72,31 @@ namespace FastFoodOperator.Services
                 EatHere = order.EatHere
             };
         }
+        public static CustomerPizzaDTO ToCustomerPizzaDTO(this OrderPizza orderPizza)
+        {
+            return new CustomerPizzaDTO
+            {
+                Name = orderPizza.Pizza.Name,
+                Ingredients = orderPizza.Pizza.PizzaIngredients
+                    .Select(pi => pi.Ingredient.Name)
+                    .ToList(),
+                CustomIngredients = (orderPizza.CustomIngredients ?? new List<CustomPizzaIngredient>())
+                    .Select(ci => ci.Ingredient.Name)
+                    .ToList(),
+                Price = (orderPizza.Pizza.Price) +
+                        (orderPizza.CustomIngredients?.Sum(ci => ci.Ingredient.Price) ?? 0)
+            };
+        }
+
 
         public static OrderForCustomerDTO ToCustomerOrder(this Order order)
         {
             return new OrderForCustomerDTO
             {
                 OrderNr = order.Id,
+                TimeOfOrder = order.TimeOfOrder,
                 Pizzas = (order.OrderPizzas ?? new List<OrderPizza>())
-                    .Select(op => op.Pizza.ToCustomerPizzaDTO())
+                    .Select(op => op.ToCustomerPizzaDTO())
                     .ToList(),
                 Drinks = (order.OrderDrinks ?? new List<OrderDrink>())
                     .Select(od => od.Drink.ToDrinkDTO())
@@ -71,14 +105,21 @@ namespace FastFoodOperator.Services
                     .Select(oe => oe.Extra.ToExtraDTO())
                     .ToList(),
                 TotalPrice = (order.OrderPizzas ?? new List<OrderPizza>())
-                    .Sum(op => op.Pizza.Price * op.Quantity) +
-                    (order.OrderDrinks ?? new List<OrderDrink>())
-                    .Sum(od => od.Drink.Price * od.Quantity) +
-                    (order.OrderExtras ?? new List<OrderExtra>())
-                    .Sum(oe => oe.Extra.Price * oe.Quantity),
-                EatHere = order.EatHere
+                             .Sum(op =>
+                                 (op.Pizza.Price * op.Quantity) +
+                                 (op.CustomIngredients?.Sum(ci => ci.Ingredient.Price) ?? 0) * op.Quantity
+                             )
+                             +
+                             (order.OrderDrinks ?? new List<OrderDrink>())
+                             .Sum(od => od.Drink.Price * od.Quantity)
+                             +
+                             (order.OrderExtras ?? new List<OrderExtra>())
+                             .Sum(oe => oe.Extra.Price * oe.Quantity),
+                EatHere = order.EatHere,
+                Price = order.Price
             };
         }
+
 
         public static DrinkDTO ToDrinkDTO(this Drink drink)
         {
