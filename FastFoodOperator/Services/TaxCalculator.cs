@@ -1,5 +1,10 @@
 ﻿namespace FastFoodOperator.Services
-{
+
+{ 
+using FastFoodOperator.Model;
+
+
+
     public static class TaxCalculator
     {
         public static decimal CalculateVAT(decimal totalPrice)

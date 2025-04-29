@@ -16,8 +16,12 @@ public static class EndpointsMapper
                 .ThenInclude(pi => pi.Ingredient)
                 .Select(p => p.ToPizzaDTO())
                 .ToList()));
+                 add-remove-toppings-endpoint
+
         app.MapGet("/drinks", (PizzaShopContext context) => TypedResults.Ok(context.Drinks));
         app.MapGet("/extras", (PizzaShopContext context) => TypedResults.Ok(context.Extras));
+
+
         app.MapPost("/orders", async (PizzaShopContext db, OrderRequest request) =>
         {
             var pizzas = await db.Pizzas
@@ -87,9 +91,7 @@ public static class EndpointsMapper
                 .IncludeAll()
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            if (order == null) return Results.NotFound("Ordern hittades inte.");
-
-            order.IsPickedUp = true;
+            if (order == null) return Results.NotFound("Ordern hittades inte.")            order.IsPickedUp = true;
             await db.SaveChangesAsync();
 
             await BroadcastOrder(order, webSocketConnections);
@@ -110,10 +112,67 @@ public static class EndpointsMapper
             return Results.Ok(pizza.ToPizzaDTO());
         });
         app.MapGet("/orders/{orderId}", async (int orderId, PizzaShopContext db) =>
+
         {
             var order = await db.Orders
                 .IncludeAll()
                 .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null) return Results.NotFound("Ordern hittades inte.");
+
+            order.IsStartedInKitchen = true;
+            await db.SaveChangesAsync();
+
+            await BroadcastOrder(order, webSocketConnections);
+            return Results.Ok(order.ToOrderDTO());
+        });
+
+
+        app.MapPut("/orders/{orderId}/pizzas/{pizzaId}/toppings", async (int orderId, int pizzaId, List<int> toppingIds, PizzaShopContext db) =>
+        {
+            // Find the order
+            var order = await db.Orders
+                .Include(o => o.OrderPizzas)
+                    .ThenInclude(op => op.CustomIngredients)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+                return Results.NotFound("Ordern hittades inte.");
+
+            // Find the pizza within the order
+            var pizza = order.OrderPizzas.FirstOrDefault(op => op.PizzaId == pizzaId);
+            if (pizza == null)
+                return Results.NotFound("Pizza hittades inte i beställningen.");
+
+            // Add selected toppings (only add new toppings if they don't exist)
+            foreach (var toppingId in toppingIds)
+            {
+                var topping = pizza.CustomIngredients.FirstOrDefault(ci => ci.IngredientId == toppingId);
+
+                if (topping == null)
+                {
+                    // If it doesn't exist, add it as an additional topping
+                    pizza.CustomIngredients.Add(new CustomPizzaIngredient
+                    {
+                        OrderPizzaId = pizza.Id,
+                        IngredientId = toppingId,
+                        IsTopping = true,
+                        IsAdded = true // Mark it as added
+                    });
+                }
+                else
+                {
+                    // If it already exists, ensure it's marked as active
+                    topping.IsAdded = true;
+                }
+            }
+
+            // Save the selected toppings for this order and pizza
+            await db.SaveChangesAsync();
+
+            return Results.Ok(order.ToOrderDTO());
+        });
+       
             if (order == null)
             {
                 return Results.NotFound("Ordern hittades inte.");
@@ -135,8 +194,6 @@ public static class EndpointsMapper
             return Results.Ok(ingredient.ToIngredientDto());
         });
 
-
-
     }
 
     private static async Task BroadcastOrder(Order order, List<WebSocket> clients)
@@ -155,6 +212,21 @@ public static class EndpointsMapper
     }
     private static async Task<List<Order>> LoadOrders(PizzaShopContext db)
     {
+        return await db.Orders.IncludeAll().ToListAsync();
+    }
+
+    // Extension för att slippa duplicera Include()
+    private static IQueryable<Order> IncludeAll(this DbSet<Order> orders)
+    {
+        return orders
+            .Include(o => o.OrderPizzas).ThenInclude(op => op.Pizza).ThenInclude(p => p.PizzaIngredients).ThenInclude(pi => pi.Ingredient)
+            .Include(o => o.OrderDrinks).ThenInclude(od => od.Drink)
+            .Include(o => o.OrderExtras).ThenInclude(oe => oe.Extra);
+    }
+
+    private static async Task<List<Order>> LoadOrders(PizzaShopContext db)
+    {
+    
         return await db.Orders.IncludeAll().ToListAsync();
     }
 
