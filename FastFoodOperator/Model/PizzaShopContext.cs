@@ -67,6 +67,13 @@ namespace FastFoodOperator.Model
         public decimal Price { get; set; }
         public bool IsOptional { get; set; }
 
+
+'
+     
+}
+
+
+
     public class OrderPizza
     {
         public int Id { get; set; }
@@ -114,7 +121,9 @@ namespace FastFoodOperator.Model
         public List<OrderExtra> OrderExtras { get; set; } = new();
         public bool IsCooked { get; set; }
         public bool IsPickedUp { get; set; }
+        public bool IsStartedInKitchen { get; set; }
         public string? Notes { get; set; }
+        public bool EatHere { get; set; }
     }
 
 }

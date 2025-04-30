@@ -45,12 +45,14 @@ namespace FastFoodOperator.Services
             return new OrderDTOs
             {
                 Id = order.Id,
+                IsStartedInKitchen = order.IsStartedInKitchen,
                 IsCooked = order.IsCooked,
                 IsPickedUp = order.IsPickedUp,
                 Pizzas = order.OrderPizzas.Select(op => op.Pizza.ToShowKitchenPizzaDTO()).ToList(),
                 Drinks = order.OrderDrinks.Select(od => od.Drink.ToDrinkDTO()).ToList(),
-                Extras = order.OrderExtras.Select(oe => oe.Extra.Name).ToList(),
-                Notes = order.Notes
+                Extras = order.OrderExtras.Select(oe => oe.Extra.ToExtraDTO()).ToList(),
+                Notes = order.Notes,
+                EatHere = order.EatHere
             };
         }
 
@@ -66,14 +68,15 @@ namespace FastFoodOperator.Services
                     .Select(od => od.Drink.ToDrinkDTO())
                     .ToList(),
                 Extras = (order.OrderExtras ?? new List<OrderExtra>())
-                    .Select(oe => oe.Extra.Name)
+                    .Select(oe => oe.Extra.ToExtraDTO())
                     .ToList(),
                 TotalPrice = (order.OrderPizzas ?? new List<OrderPizza>())
                     .Sum(op => op.Pizza.Price * op.Quantity) +
                     (order.OrderDrinks ?? new List<OrderDrink>())
                     .Sum(od => od.Drink.Price * od.Quantity) +
                     (order.OrderExtras ?? new List<OrderExtra>())
-                    .Sum(oe => oe.Extra.Price * oe.Quantity)
+                    .Sum(oe => oe.Extra.Price * oe.Quantity),
+                EatHere = order.EatHere
             };
         }
 
@@ -87,7 +90,15 @@ namespace FastFoodOperator.Services
                 Price = drink.Price
             };
         }
-
+        public static ExtraDTO ToExtraDTO(this Extra extra)
+        {
+            return new ExtraDTO
+            {
+                Name = extra.Name,
+                Info = extra.Info,
+                Price = extra.Price
+            };
+        }
         public static PizzaInKitchenDTO ToShowKitchenPizzaDTO(this Pizza pizza)
         {
             return new PizzaInKitchenDTO
