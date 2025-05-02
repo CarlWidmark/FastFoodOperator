@@ -118,6 +118,7 @@ namespace FastFoodOperator.Model
         public bool IsPickedUp { get; set; }
         public string? Notes { get; set; }
         public bool EatHere { get; set; }
+        public decimal Price { get; set; }
     }
 
 }

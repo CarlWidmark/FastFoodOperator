@@ -136,11 +136,12 @@ namespace FastFoodOperator.Services
 
             var extras = new List<Extra>
             {
-                new Extra { Name = "Pizzasallad", Info= "Vitkålssallad med vinägrett.", Price= 30},
-                new Extra { Name = "Vitlöksbröd", Info= "Bröd med vitlök", Price= 30},
-                new Extra { Name = "Mozzarella sticks 4 st", Info= "Friterade mozzarellastavar.", Price= 30},
-                new Extra { Name = "Mozzarella sticks 8 st", Info= "Friterade mozzarellastavar.", Price= 60},
-                new Extra { Name = "Pommes frites", Info= "Pommes Frittes- tallrik", Price= 45},
+                new Extra { Name = "Pizzasallad", Info= "Vitkålssallad med vinägrett.", Price= 20},
+                new Extra { Name = "Vitlöksbröd", Info= "Bröd med vitlök", Price= 20},
+                new Extra { Name = "Mozzarella sticks 4 st", Info= "Friterade mozzarellastavar.", Price= 20},
+                new Extra { Name = "Mozzarella sticks 8 st", Info= "Friterade mozzarellastavar.", Price= 35},
+                new Extra { Name = "Pommes frites", Info= "Pommes Frittes- tallrik", Price= 35},
+
 
             };
             db.Extras.AddRange(extras);
