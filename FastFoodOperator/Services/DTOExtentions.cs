@@ -129,5 +129,9 @@ namespace FastFoodOperator.Services
             public List<int> DrinkIds { get; set; } = new();
             public List<int> ExtraIds { get; set; } = new();
         }
+        public static decimal GetTotalPrice(this OrderRequest orderRequest) 
+        { 
+
+        }
     }
 }

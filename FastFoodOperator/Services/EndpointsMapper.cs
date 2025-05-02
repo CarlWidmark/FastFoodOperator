@@ -40,7 +40,7 @@ public static class EndpointsMapper
                 OrderDrinks = drinks.Select(d => new OrderDrink { Drink = d, Quantity = 1 }).ToList(),
                 OrderExtras = extras.Select(e => new OrderExtra { Extra = e, Quantity = 1 }).ToList()
             };
-
+            order.GetTotalPrice();
             db.Orders.Add(order);
             await db.SaveChangesAsync();
 
