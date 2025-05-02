@@ -125,21 +125,21 @@ namespace FastFoodOperator.Services
             var drinks = new List<Drink>
              {
                 new Drink { Name = "Coca-Cola", Size = 33, Unit = "Cl", Price = 20 },
-                new Drink { Name = "Pepsi", Size = 50, Unit = "Cl", Price = 25 },
-                new Drink { Name = "Fanta", Size = 33, Unit = "Cl", Price = 18 },
-                new Drink { Name = "Sprite", Size = 50, Unit = "Cl", Price = 22 },
-                new Drink { Name = "Loka", Size = 50, Unit = "Cl", Price = 15 },
-                new Drink { Name = "Ramlösa", Size = 50, Unit = "Cl", Price = 15 },
+                new Drink { Name = "Pepsi", Size = 33, Unit = "Cl", Price = 20 },
+                new Drink { Name = "Fanta", Size = 33, Unit = "Cl", Price = 20 },
+                new Drink { Name = "Sprite", Size = 33, Unit = "Cl", Price = 20 },
+                new Drink { Name = "Loka", Size = 33, Unit = "Cl", Price = 20 },
+                new Drink { Name = "Ramlösa", Size = 33, Unit = "Cl", Price = 20 },
              };
             db.Drinks.AddRange(drinks);
             db.SaveChanges();
 
             var extras = new List<Extra>
             {
-                new Extra { Name = "Pizzasallad", Info= "Vitkålssallad med vinägrett.", Price= 15},
-                new Extra { Name = "Vitlöksbröd", Info= "Bröd med vitlök", Price= 25},
-                new Extra { Name = "Mozzarella sticks 4 st", Info= "Friterade mozzarellastavar.", Price= 60},
-                new Extra { Name = "Mozzarella sticks 8 st", Info= "Friterade mozzarellastavar.", Price= 90},
+                new Extra { Name = "Pizzasallad", Info= "Vitkålssallad med vinägrett.", Price= 20},
+                new Extra { Name = "Vitlöksbröd", Info= "Bröd med vitlök", Price= 20},
+                new Extra { Name = "Mozzarella sticks 4 st", Info= "Friterade mozzarellastavar.", Price= 20},
+                new Extra { Name = "Mozzarella sticks 8 st", Info= "Friterade mozzarellastavar.", Price= 35},
                 new Extra { Name = "Pommes frites", Info= "Pommes Frittes- tallrik", Price= 35},
 
 
