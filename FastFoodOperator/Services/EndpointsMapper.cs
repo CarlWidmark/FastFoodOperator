@@ -36,6 +36,7 @@ public static class EndpointsMapper
                 IsCooked = false,
                 IsPickedUp = false,
                 EatHere = request.EatHere,
+                TimeOfOrder = DateTime.Now,
                 OrderPizzas = pizzas.Select(p => new OrderPizza { Pizza = p, Quantity = 1 }).ToList(),
                 OrderDrinks = drinks.Select(d => new OrderDrink { Drink = d, Quantity = 1 }).ToList(),
                 OrderExtras = extras.Select(e => new OrderExtra { Extra = e, Quantity = 1 }).ToList(),
@@ -139,10 +140,15 @@ public static class EndpointsMapper
 
             return Results.Ok(ingredient.ToIngredientDto());
         });
+		app.MapGet("/api/tax/vat/{totalPrice:decimal}", (decimal totalPrice) =>
+		{
+			var vat = TaxCalculator.CalculateVAT(totalPrice);
+			return Results.Ok(vat);
+		});
 
 
 
-    }
+	}
 
     private static async Task BroadcastOrder(Order order, List<WebSocket> clients)
     {

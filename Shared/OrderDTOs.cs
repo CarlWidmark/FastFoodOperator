@@ -1,4 +1,6 @@
-﻿namespace Shared
+﻿using System.Text.Json.Serialization;
+
+namespace Shared
 {
     public class OrderDTOs
     {
@@ -24,5 +26,5 @@
         public bool EatHere { get; set; }
         public decimal Price { get; set; }
 
-    }
+	}
 }
