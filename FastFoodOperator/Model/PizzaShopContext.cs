@@ -109,7 +109,7 @@ namespace FastFoodOperator.Model
     public class Order
     {
         public int Id { get; set; }
-        public DateTime TimeOfOrder { get; set; } = DateTime.Now;
+        public DateTime TimeOfOrder { get; set; }
         public List<OrderPizza> OrderPizzas { get; set; } = new();
         public List<OrderDrink> OrderDrinks { get; set; } = new();
         public List<OrderExtra> OrderExtras { get; set; } = new();
@@ -119,6 +119,7 @@ namespace FastFoodOperator.Model
         public string? Notes { get; set; }
         public bool EatHere { get; set; }
         public decimal Price { get; set; }
-    }
+
+	}
 
 }
