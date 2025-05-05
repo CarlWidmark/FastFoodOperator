@@ -10,6 +10,8 @@ namespace FastFoodOperator.Model
         public DbSet<Drink> Drinks { get; set; }
         public DbSet<Extra> Extras { get; set; }
 
+        public DbSet<Menu> Menus { get; set; }
+
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<PizzaIngredient> PizzaIngredients { get; set; }
 
@@ -23,6 +25,21 @@ namespace FastFoodOperator.Model
         {
             modelBuilder.Entity<PizzaIngredient>()
                 .HasKey(pi => new { pi.PizzaId, pi.IngredientId });
+            modelBuilder.Entity<Menu>()
+            .HasOne(m => m.Pizza)
+            .WithMany()
+            .HasForeignKey(m => m.PizzaId);
+
+            modelBuilder.Entity<Menu>()
+                .HasOne(m => m.Drink)
+                .WithMany()
+                .HasForeignKey(m => m.DrinkId);
+
+            modelBuilder.Entity<Menu>()
+                .HasOne(m => m.Extra)
+                .WithMany()
+                .HasForeignKey(m => m.ExtraId);
+
         }
     }
 
@@ -113,6 +130,8 @@ namespace FastFoodOperator.Model
         public List<OrderPizza> OrderPizzas { get; set; } = new();
         public List<OrderDrink> OrderDrinks { get; set; } = new();
         public List<OrderExtra> OrderExtras { get; set; } = new();
+        public List<OrderMenu> OrderMenus { get; set; } = new();
+
         public bool IsStartedInKitchen { get; set; }
         public bool IsCooked { get; set; }
         public bool IsPickedUp { get; set; }
@@ -120,5 +139,33 @@ namespace FastFoodOperator.Model
         public bool EatHere { get; set; }
         public decimal Price { get; set; }
     }
+    public class Menu
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+
+        public int PizzaId { get; set; }
+        public Pizza Pizza { get; set; }
+
+        public int DrinkId { get; set; }
+        public Drink Drink { get; set; }
+
+        public int ExtraId { get; set; }
+        public Extra Extra { get; set; }
+    }
+    public class OrderMenu
+    {
+        public int Id { get; set; }
+        public int OrderId { get; set; }
+        public Order Order { get; set; }
+
+        public int MenuId { get; set; }
+        public Menu Menu { get; set; }
+
+        public int Quantity { get; set; }
+    }
+
+
 
 }

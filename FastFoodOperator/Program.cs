@@ -29,7 +29,7 @@ public class Program
 
         var app = builder.Build();
         app.UseCors("AllowFrontend");
-        app.UseWebSockets(); // Aktivera WebSocket-stöd
+        app.UseWebSockets();
 
         var webSocketConnections = new List<WebSocket>();
 
@@ -73,7 +73,7 @@ public class Program
             DatabaseHelper.PopulateDatabase(db);
         }
 
-        app.MapEndpoints(webSocketConnections); // Skicka med WebSocket-listan
+        app.MapEndpoints(webSocketConnections);
 
         app.Run();
     }

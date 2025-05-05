@@ -30,6 +30,36 @@ public static class EndpointsMapper
             var extras = await db.Extras
                 .Where(e => request.ExtraIds.Contains(e.Id)).ToListAsync();
 
+            var menuPizzaIds = request.Menus.Select(m => m.PizzaId).Distinct();
+            var menuDrinkIds = request.Menus.Select(m => m.DrinkId).Distinct();
+            var menuExtraIds = request.Menus.Select(m => m.ExtraId).Distinct();
+
+            var menuPizzas = await db.Pizzas.Where(p => menuPizzaIds.Contains(p.Id)).ToDictionaryAsync(p => p.Id);
+            var menuDrinks = await db.Drinks.Where(d => menuDrinkIds.Contains(d.Id)).ToDictionaryAsync(d => d.Id);
+            var menuExtras = await db.Extras.Where(e => menuExtraIds.Contains(e.Id)).ToDictionaryAsync(e => e.Id);
+
+            var orderMenus = request.Menus.Select(m =>
+            {
+                var pizza = menuPizzas[m.PizzaId];
+                var drink = menuDrinks[m.DrinkId];
+                var extra = menuExtras[m.ExtraId];
+
+                var menu = new Menu
+                {
+                    Name = m.Name,
+                    Pizza = pizza,
+                    Drink = drink,
+                    Extra = extra,
+                    Price = pizza.Price + extra.Price
+                };
+
+                return new OrderMenu
+                {
+                    Menu = menu,
+                    Quantity = m.Quantity
+                };
+            }).ToList();
+
             var order = new Order
             {
                 IsStartedInKitchen = false,
@@ -39,9 +69,8 @@ public static class EndpointsMapper
                 OrderPizzas = pizzas.Select(p => new OrderPizza { Pizza = p, Quantity = 1 }).ToList(),
                 OrderDrinks = drinks.Select(d => new OrderDrink { Drink = d, Quantity = 1 }).ToList(),
                 OrderExtras = extras.Select(e => new OrderExtra { Extra = e, Quantity = 1 }).ToList(),
-
+                OrderMenus = orderMenus
             };
-
 
             order.GetTotalPrice();
 
@@ -52,6 +81,7 @@ public static class EndpointsMapper
 
             return Results.Ok(order.ToCustomerOrder());
         });
+
 
         app.MapGet("/orders/allOrders", async (PizzaShopContext db) =>
         {
@@ -163,13 +193,16 @@ public static class EndpointsMapper
         return await db.Orders.IncludeAll().ToListAsync();
     }
 
-    // Extension för att slippa duplicera Include()
     private static IQueryable<Order> IncludeAll(this DbSet<Order> orders)
     {
         return orders
             .Include(o => o.OrderPizzas).ThenInclude(op => op.Pizza).ThenInclude(p => p.PizzaIngredients).ThenInclude(pi => pi.Ingredient)
             .Include(o => o.OrderDrinks).ThenInclude(od => od.Drink)
-            .Include(o => o.OrderExtras).ThenInclude(oe => oe.Extra);
+            .Include(o => o.OrderExtras).ThenInclude(oe => oe.Extra)
+            .Include(o => o.OrderMenus).ThenInclude(om => om.Menu).ThenInclude(m => m.Pizza).ThenInclude(p => p.PizzaIngredients).ThenInclude(pi => pi.Ingredient)
+            .Include(o => o.OrderMenus).ThenInclude(om => om.Menu).ThenInclude(m => m.Drink)
+            .Include(o => o.OrderMenus).ThenInclude(om => om.Menu).ThenInclude(m => m.Extra);
     }
+
 
 }

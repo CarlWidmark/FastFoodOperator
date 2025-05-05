@@ -42,16 +42,25 @@ namespace FastFoodOperator.Services
 
         public static decimal GetTotalPrice(this Order order)
         {
-            order.Price = (order.OrderPizzas ?? new List<OrderPizza>())
-                          .Sum(op =>
-                              (op.Pizza?.Price ?? 0) * op.Quantity +
-                              (op.CustomIngredients?.Sum(ci => ci.Ingredient.Price) ?? 0) * op.Quantity
-                          )
-                          +
-                          (order.OrderDrinks ?? new List<OrderDrink>())
-                          .Sum(od => od.Drink.Price * od.Quantity) +
-                          (order.OrderExtras ?? new List<OrderExtra>())
-                          .Sum(oe => oe.Extra.Price * oe.Quantity);
+            order.Price =
+                // Menyer
+                (order.OrderMenus ?? new List<OrderMenu>())
+                    .Sum(om => (om.Menu?.Price ?? 0) * om.Quantity)
+                +
+                // Pizzor + anpassade ingredienser
+                (order.OrderPizzas ?? new List<OrderPizza>())
+                    .Sum(op =>
+                        (op.Pizza?.Price ?? 0) * op.Quantity +
+                        (op.CustomIngredients?.Sum(ci => ci.Ingredient?.Price ?? 0) ?? 0) * op.Quantity
+                    )
+                +
+                // Drycker
+                (order.OrderDrinks ?? new List<OrderDrink>())
+                    .Sum(od => (od.Drink?.Price ?? 0) * od.Quantity)
+                +
+                // Extras
+                (order.OrderExtras ?? new List<OrderExtra>())
+                    .Sum(oe => (oe.Extra?.Price ?? 0) * oe.Quantity);
 
             return order.Price;
         }
@@ -68,6 +77,7 @@ namespace FastFoodOperator.Services
                 Pizzas = order.OrderPizzas.Select(op => op.Pizza.ToShowKitchenPizzaDTO()).ToList(),
                 Drinks = order.OrderDrinks.Select(od => od.Drink.ToDrinkDTO()).ToList(),
                 Extras = order.OrderExtras.Select(oe => oe.Extra.ToExtraDTO()).ToList(),
+                Menus = order.OrderMenus.Select(om => om.Menu.ToMenuDTO()).ToList(),
                 Notes = order.Notes,
                 EatHere = order.EatHere
             };
@@ -104,21 +114,13 @@ namespace FastFoodOperator.Services
                 Extras = (order.OrderExtras ?? new List<OrderExtra>())
                     .Select(oe => oe.Extra.ToExtraDTO())
                     .ToList(),
-                TotalPrice = (order.OrderPizzas ?? new List<OrderPizza>())
-                             .Sum(op =>
-                                 (op.Pizza.Price * op.Quantity) +
-                                 (op.CustomIngredients?.Sum(ci => ci.Ingredient.Price) ?? 0) * op.Quantity
-                             )
-                             +
-                             (order.OrderDrinks ?? new List<OrderDrink>())
-                             .Sum(od => od.Drink.Price * od.Quantity)
-                             +
-                             (order.OrderExtras ?? new List<OrderExtra>())
-                             .Sum(oe => oe.Extra.Price * oe.Quantity),
-                EatHere = order.EatHere,
-                Price = order.Price
+                Menus = (order.OrderMenus ?? new List<OrderMenu>())
+                    .Select(om => om.Menu.ToMenuDTO())
+                    .ToList(),
+                EatHere = order.EatHere
             };
         }
+
 
 
         public static DrinkDTO ToDrinkDTO(this Drink drink)
@@ -170,9 +172,20 @@ namespace FastFoodOperator.Services
             public List<int> DrinkIds { get; set; } = new();
             public List<int> ExtraIds { get; set; } = new();
         }
-        public static decimal GetTotalPrice(this OrderRequest orderRequest) 
-        { 
-
+        public static MenuDTO ToMenuDTO(this Menu menu)
+        {
+            return new MenuDTO
+            {
+                Id = menu.Id,
+                Name = menu.Name,
+                Pizza = menu.Pizza?.ToPizzaDTO(),
+                Drink = menu.Drink?.ToDrinkDTO(),
+                Extra = menu.Extra?.ToExtraDTO(),
+                Price = menu.Price
+            };
         }
+
+
+
     }
 }

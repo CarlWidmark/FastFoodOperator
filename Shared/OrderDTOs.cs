@@ -9,6 +9,7 @@
         public List<PizzaInKitchenDTO> Pizzas { get; set; } = new();
         public List<DrinkDTO> Drinks { get; set; } = new();
         public List<ExtraDTO> Extras { get; set; } = new();
+        public List<MenuDTO> Menus { get; set; } = new();
         public string? Notes { get; set; }
         public bool EatHere { get; set; }
 
@@ -20,6 +21,7 @@
         public List<CustomerPizzaDTO> Pizzas { get; set; } = new();
         public List<DrinkDTO> Drinks { get; set; } = new();
         public List<ExtraDTO> Extras { get; set; } = new();
+        public List<MenuDTO> Menus { get; set; } = new();
         public decimal TotalPrice { get; set; }
         public bool EatHere { get; set; }
         public decimal Price { get; set; }
