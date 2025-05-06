@@ -16,13 +16,19 @@ public static class EndpointsMapper
                 .ThenInclude(pi => pi.Ingredient)
                 .Select(p => p.ToPizzaDTO())
                 .ToList()));
+
+
         app.MapGet("/drinks", (PizzaShopContext context) => TypedResults.Ok(context.Drinks));
         app.MapGet("/extras", (PizzaShopContext context) => TypedResults.Ok(context.Extras));
+
+
+      
         app.MapPost("/orders", async (PizzaShopContext db, OrderRequest request) =>
         {
             var pizzas = await db.Pizzas
                 .Include(p => p.PizzaIngredients).ThenInclude(pi => pi.Ingredient)
                 .Where(p => request.PizzaIds.Contains(p.Id)).ToListAsync();
+
 
             var drinks = await db.Drinks
                 .Where(d => request.DrinkIds.Contains(d.Id)).ToListAsync();
@@ -58,6 +64,7 @@ public static class EndpointsMapper
             var orders = await LoadOrders(db);
             return Results.Ok(orders.Select(o => o.ToOrderDTO()));
         });
+
         app.MapPut("/orders/{orderId}/IsStartedInKitchen", async (int orderId, PizzaShopContext db) =>
         {
             var order = await db.Orders
@@ -72,6 +79,7 @@ public static class EndpointsMapper
             await BroadcastOrder(order, webSocketConnections);
             return Results.Ok(order.ToOrderDTO());
         });
+
         app.MapPut("/orders/{orderId}/DoneInKitchen", async (int orderId, PizzaShopContext db) =>
         {
             var order = await db.Orders
@@ -86,6 +94,7 @@ public static class EndpointsMapper
             await BroadcastOrder(order, webSocketConnections);
             return Results.Ok(order.ToOrderDTO());
         });
+
         app.MapPut("/orders/{orderId}/IsCollectedByCustomer", async (int orderId, PizzaShopContext db) =>
         {
             var order = await db.Orders
@@ -116,6 +125,7 @@ public static class EndpointsMapper
         });
         app.MapGet("/orders/{orderId}", async (int orderId, PizzaShopContext db) =>
         {
+
             var order = await db.Orders
                 .IncludeAll()
                 .FirstOrDefaultAsync(o => o.Id == orderId);
@@ -140,8 +150,6 @@ public static class EndpointsMapper
             return Results.Ok(ingredient.ToIngredientDto());
         });
 
-
-
     }
 
     private static async Task BroadcastOrder(Order order, List<WebSocket> clients)
@@ -158,6 +166,20 @@ public static class EndpointsMapper
             }
         }
     }
+    private static async Task<List<Order>> LoadOrders(PizzaShopContext db)
+    {
+        return await db.Orders.IncludeAll().ToListAsync();
+    }
+
+    // Extension för att slippa duplicera Include()
+    private static IQueryable<Order> IncludeAll(this DbSet<Order> orders)
+    {
+        return orders
+            .Include(o => o.OrderPizzas).ThenInclude(op => op.Pizza).ThenInclude(p => p.PizzaIngredients).ThenInclude(pi => pi.Ingredient)
+            .Include(o => o.OrderDrinks).ThenInclude(od => od.Drink)
+            .Include(o => o.OrderExtras).ThenInclude(oe => oe.Extra);
+    }
+
     private static async Task<List<Order>> LoadOrders(PizzaShopContext db)
     {
         return await db.Orders.IncludeAll().ToListAsync();
