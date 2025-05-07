@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
+using FastFoodOperator.Model;
 namespace FastFoodOperator.Model
 {
     public class PizzaShopContext : DbContext
@@ -21,7 +21,20 @@ namespace FastFoodOperator.Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<PizzaIngredient>()
+            
+                modelBuilder.Entity<Pizza>()
+                    .Property(p => p.Price)
+                    .HasColumnType("decimal(18,2)");
+
+                modelBuilder.Entity<Ingredient>()
+                    .Property(i => i.Price)
+                    .HasColumnType("decimal(18,2)");
+
+                modelBuilder.Entity<Extra>()
+                    .Property(e => e.Price)
+                    .HasColumnType("decimal(18,2)");
+
+                modelBuilder.Entity<PizzaIngredient>()
                 .HasKey(pi => new { pi.PizzaId, pi.IngredientId });
         }
     }
@@ -67,11 +80,8 @@ namespace FastFoodOperator.Model
         public decimal Price { get; set; }
         public bool IsOptional { get; set; }
 
-
-'
-     
+    }
 }
-
 
 
     public class OrderPizza
@@ -126,4 +136,4 @@ namespace FastFoodOperator.Model
         public bool EatHere { get; set; }
     }
 
-}
+

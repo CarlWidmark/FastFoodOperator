@@ -1,4 +1,5 @@
 ﻿using FastFoodOperator.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net.WebSockets;
 using System.Text;
@@ -61,6 +62,42 @@ namespace FastFoodOperator.Services
                 return Results.Ok(order.ToCustomerOrder());
             });
 
+            app.MapPut("/orders/{orderId}/pizzas/{pizzaId}/toppings", async (int orderId, int pizzaId, [FromBody] List<int> toppingIds, PizzaShopContext db) =>
+            {
+                var order = await db.Orders
+                    .Include(o => o.OrderPizzas)
+                    .ThenInclude(op => op.Pizza)
+                    .FirstOrDefaultAsync(o => o.Id == orderId);
+
+                if (order == null)
+                {
+                    return Results.NotFound("Order not found.");
+                }
+
+                var pizza = order.OrderPizzas.FirstOrDefault(p => p.PizzaId == pizzaId);
+                if (pizza == null)
+                {
+                    return Results.NotFound("Pizza not found.");
+                }
+
+                
+                foreach (var toppingId in toppingIds)
+                {
+                    var topping = await db.Ingredients.FindAsync(toppingId);
+                    if (topping != null)
+                    {
+                        pizza.Pizza.PizzaIngredients.Add(new PizzaIngredient
+                        {
+                            PizzaId = pizzaId,
+                            IngredientId = toppingId
+                        });
+                    }
+                }
+
+                await db.SaveChangesAsync();
+
+                return Results.Ok(pizza.Pizza); 
+            });
 
             app.MapGet("/orders/allOrders", async (PizzaShopContext db) =>
             {
