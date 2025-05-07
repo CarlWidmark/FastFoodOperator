@@ -20,60 +20,104 @@ public static class EndpointsMapper
         app.MapGet("/extras", (PizzaShopContext context) => TypedResults.Ok(context.Extras));
         app.MapPost("/orders", async (PizzaShopContext db, OrderRequest request) =>
         {
+            
+            var pizzaQuantities = request.PizzaIds
+                .GroupBy(id => id)
+                .ToDictionary(g => g.Key, g => g.Count());
+
             var pizzas = await db.Pizzas
                 .Include(p => p.PizzaIngredients).ThenInclude(pi => pi.Ingredient)
-                .Where(p => request.PizzaIds.Contains(p.Id)).ToListAsync();
+                .Where(p => pizzaQuantities.Keys.Contains(p.Id))
+                .ToListAsync();
+
+           
+            var drinkQuantities = request.DrinkIds
+                .GroupBy(id => id)
+                .ToDictionary(g => g.Key, g => g.Count());
 
             var drinks = await db.Drinks
-                .Where(d => request.DrinkIds.Contains(d.Id)).ToListAsync();
+                .Where(d => drinkQuantities.Keys.Contains(d.Id))
+                .ToListAsync();
+
+            
+            var extraQuantities = request.ExtraIds
+                .GroupBy(id => id)
+                .ToDictionary(g => g.Key, g => g.Count());
 
             var extras = await db.Extras
-                .Where(e => request.ExtraIds.Contains(e.Id)).ToListAsync();
+                .Where(e => extraQuantities.Keys.Contains(e.Id))
+                .ToListAsync();
 
-            var menuPizzaIds = request.Menus.Select(m => m.PizzaId).Distinct();
-            var menuDrinkIds = request.Menus.Select(m => m.DrinkId).Distinct();
-            var menuExtraIds = request.Menus.Select(m => m.ExtraId).Distinct();
+            
+            var groupedMenus = request.Menus
+                .GroupBy(m => new { m.PizzaId, m.DrinkId, m.ExtraId, m.Name })
+                .Select(g => new
+                {
+                    Key = g.Key,
+                    Quantity = g.Sum(m => m.Quantity)
+                })
+                .ToList();
+
+            
+            var menuPizzaIds = groupedMenus.Select(m => m.Key.PizzaId).Distinct();
+            var menuDrinkIds = groupedMenus.Select(m => m.Key.DrinkId).Distinct();
+            var menuExtraIds = groupedMenus.Select(m => m.Key.ExtraId).Distinct();
 
             var menuPizzas = await db.Pizzas.Where(p => menuPizzaIds.Contains(p.Id)).ToDictionaryAsync(p => p.Id);
             var menuDrinks = await db.Drinks.Where(d => menuDrinkIds.Contains(d.Id)).ToDictionaryAsync(d => d.Id);
             var menuExtras = await db.Extras.Where(e => menuExtraIds.Contains(e.Id)).ToDictionaryAsync(e => e.Id);
 
-            var orderMenus = request.Menus.Select(m =>
+            var orderMenus = groupedMenus.Select(g =>
             {
-                var pizza = menuPizzas[m.PizzaId];
-                var drink = menuDrinks[m.DrinkId];
-                var extra = menuExtras[m.ExtraId];
+                var pizza = menuPizzas[g.Key.PizzaId];
+                var drink = menuDrinks[g.Key.DrinkId];
+                var extra = menuExtras[g.Key.ExtraId];
 
                 var menu = new Menu
                 {
-                    Name = m.Name,
+                    Name = g.Key.Name,
                     Pizza = pizza,
                     Drink = drink,
                     Extra = extra,
-                    Price = pizza.Price + extra.Price
+                    Price = pizza.Price + extra.Price 
                 };
 
                 return new OrderMenu
                 {
                     Menu = menu,
-                    Quantity = m.Quantity
+                    Quantity = g.Quantity
                 };
             }).ToList();
 
+            
             var order = new Order
             {
                 IsStartedInKitchen = false,
                 IsCooked = false,
                 IsPickedUp = false,
                 EatHere = request.EatHere,
-                OrderPizzas = pizzas.Select(p => new OrderPizza { Pizza = p, Quantity = 1 }).ToList(),
-                OrderDrinks = drinks.Select(d => new OrderDrink { Drink = d, Quantity = 1 }).ToList(),
-                OrderExtras = extras.Select(e => new OrderExtra { Extra = e, Quantity = 1 }).ToList(),
+                OrderPizzas = pizzas.Select(p => new OrderPizza
+                {
+                    Pizza = p,
+                    Quantity = pizzaQuantities[p.Id]
+                }).ToList(),
+                OrderDrinks = drinks.Select(d => new OrderDrink
+                {
+                    Drink = d,
+                    Quantity = drinkQuantities[d.Id]
+                }).ToList(),
+                OrderExtras = extras.Select(e => new OrderExtra
+                {
+                    Extra = e,
+                    Quantity = extraQuantities[e.Id]
+                }).ToList(),
                 OrderMenus = orderMenus
             };
 
+            
             order.GetTotalPrice();
 
+           
             db.Orders.Add(order);
             await db.SaveChangesAsync();
 
@@ -85,9 +129,73 @@ public static class EndpointsMapper
 
         app.MapGet("/orders/allOrders", async (PizzaShopContext db) =>
         {
-            var orders = await LoadOrders(db);
-            return Results.Ok(orders.Select(o => o.ToOrderDTO()));
+            var orders = await db.Orders.IncludeAll().ToListAsync();
+
+            var ordersWithQuantities = orders.Select(o => new
+            {
+                orderNr = o.Id,
+                timeOfOrder = o.TimeOfOrder,
+                eatHere = o.EatHere,
+                isStartedInKitchen = o.IsStartedInKitchen,
+                isCooked = o.IsCooked,
+                isPickedUp = o.IsPickedUp,
+                pizzas = o.OrderPizzas.Select(op => new {
+                    name = op.Pizza.Name,
+                    price = op.Pizza.Price,
+                    quantity = op.Quantity,
+                    ingredients = op.Pizza.PizzaIngredients.Select(pi => pi.Ingredient.Name)
+                }),
+                drinks = o.OrderDrinks.Select(od => new {
+                    name = od.Drink.Name,
+                    size = od.Drink.Size,
+                    unit = od.Drink.Unit,
+                    price = od.Drink.Price,
+                    quantity = od.Quantity
+                }),
+                extras = o.OrderExtras.Select(oe => new {
+                    name = oe.Extra.Name,
+                    price = oe.Extra.Price,
+                    quantity = oe.Quantity
+                }),
+                orderMenus = o.OrderMenus.Select(om => new {
+                    quantity = om.Quantity,
+                    menu = new
+                    {
+                        name = om.Menu.Name,
+                        price = om.Menu.Price,
+                        pizza = new
+                        {
+                            name = om.Menu.Pizza.Name,
+                            price = om.Menu.Pizza.Price,
+                            ingredients = om.Menu.Pizza.PizzaIngredients.Select(pi => pi.Ingredient.Name)
+                        },
+                        drink = new
+                        {
+                            name = om.Menu.Drink.Name,
+                            size = om.Menu.Drink.Size,
+                            unit = om.Menu.Drink.Unit,
+                            price = om.Menu.Drink.Price
+                        },
+                        extra = new
+                        {
+                            name = om.Menu.Extra.Name,
+                            price = om.Menu.Extra.Price
+                        }
+                    },
+                    
+                })
+                
+              
+            }).ToList();
+
+            return Results.Ok(ordersWithQuantities);
         });
+        app.MapGet("/api/tax/vat/{totalPrice:decimal}", (decimal totalPrice) =>
+        {
+            var vat = TaxCalculator.CalculateVAT(totalPrice);
+            return Results.Ok(vat);
+        });
+
         app.MapPut("/orders/{orderId}/IsStartedInKitchen", async (int orderId, PizzaShopContext db) =>
         {
             var order = await db.Orders
@@ -100,7 +208,7 @@ public static class EndpointsMapper
             await db.SaveChangesAsync();
 
             await BroadcastOrder(order, webSocketConnections);
-            return Results.Ok(order.ToOrderDTO());
+            return Results.Ok(order.ToCustomerOrder());
         });
         app.MapPut("/orders/{orderId}/DoneInKitchen", async (int orderId, PizzaShopContext db) =>
         {
@@ -114,7 +222,7 @@ public static class EndpointsMapper
             await db.SaveChangesAsync();
 
             await BroadcastOrder(order, webSocketConnections);
-            return Results.Ok(order.ToOrderDTO());
+            return Results.Ok(order.ToCustomerOrder());
         });
         app.MapPut("/orders/{orderId}/IsCollectedByCustomer", async (int orderId, PizzaShopContext db) =>
         {

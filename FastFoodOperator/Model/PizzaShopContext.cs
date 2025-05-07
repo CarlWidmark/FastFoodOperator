@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace FastFoodOperator.Model
 {
@@ -138,6 +139,65 @@ namespace FastFoodOperator.Model
         public string? Notes { get; set; }
         public bool EatHere { get; set; }
         public decimal Price { get; set; }
+        public object ToCustomerOrder()
+        {
+            return new
+            {
+                id = Id,
+                timeOfOrder = TimeOfOrder,
+                eatHere = EatHere,
+                pizzas = OrderPizzas?.Select(op => new {
+                    name = op.Pizza.Name,
+                    price = op.Pizza.Price,
+                    quantity = op.Quantity,
+                    ingredients = op.Pizza.PizzaIngredients.Select(pi => pi.Ingredient.Name),
+                    customIngredients = (op.CustomIngredients ?? new List<CustomPizzaIngredient>())
+                                .Select(ci => ci.Ingredient.Name)
+                }),
+                drinks = OrderDrinks?.Select(od => new {
+                    name = od.Drink.Name,
+                    size = od.Drink.Size,
+                    unit = od.Drink.Unit,
+                    price = od.Drink.Price,
+                    quantity = od.Quantity
+                }),
+                extras = OrderExtras?.Select(oe => new {
+                    name = oe.Extra.Name,
+                    price = oe.Extra.Price,
+                    quantity = oe.Quantity
+                }),
+                orderMenus = OrderMenus?.Select(om => new {
+                    quantity = om.Quantity,
+                    menu = new
+                    {
+                        name = om.Menu.Name,
+                        price = om.Menu.Price,
+                        pizza = new
+                        {
+                            name = om.Menu.Pizza.Name,
+                            price = om.Menu.Pizza.Price,
+                            ingredients = om.Menu.Pizza.PizzaIngredients.Select(pi => pi.Ingredient.Name)
+                        },
+                        drink = new
+                        {
+                            name = om.Menu.Drink.Name,
+                            size = om.Menu.Drink.Size,
+                            unit = om.Menu.Drink.Unit,
+                            price = om.Menu.Drink.Price
+                        },
+                        extra = new
+                        {
+                            name = om.Menu.Extra.Name,
+                            price = om.Menu.Extra.Price
+                        }
+                    }
+                }),
+                IsStartedInKitchen = false,
+                IsCooked = false,
+                IsPickedUp = false
+            };
+        }
+
     }
     public class Menu
     {

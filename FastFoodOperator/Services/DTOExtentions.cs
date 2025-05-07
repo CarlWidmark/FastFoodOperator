@@ -43,22 +43,22 @@ namespace FastFoodOperator.Services
         public static decimal GetTotalPrice(this Order order)
         {
             order.Price =
-                // Menyer
+                
                 (order.OrderMenus ?? new List<OrderMenu>())
                     .Sum(om => (om.Menu?.Price ?? 0) * om.Quantity)
                 +
-                // Pizzor + anpassade ingredienser
+                
                 (order.OrderPizzas ?? new List<OrderPizza>())
                     .Sum(op =>
                         (op.Pizza?.Price ?? 0) * op.Quantity +
                         (op.CustomIngredients?.Sum(ci => ci.Ingredient?.Price ?? 0) ?? 0) * op.Quantity
                     )
                 +
-                // Drycker
+                
                 (order.OrderDrinks ?? new List<OrderDrink>())
                     .Sum(od => (od.Drink?.Price ?? 0) * od.Quantity)
                 +
-                // Extras
+               
                 (order.OrderExtras ?? new List<OrderExtra>())
                     .Sum(oe => (oe.Extra?.Price ?? 0) * oe.Quantity);
 
@@ -95,29 +95,6 @@ namespace FastFoodOperator.Services
                     .ToList(),
                 Price = (orderPizza.Pizza.Price) +
                         (orderPizza.CustomIngredients?.Sum(ci => ci.Ingredient.Price) ?? 0)
-            };
-        }
-
-
-        public static OrderForCustomerDTO ToCustomerOrder(this Order order)
-        {
-            return new OrderForCustomerDTO
-            {
-                OrderNr = order.Id,
-                TimeOfOrder = order.TimeOfOrder,
-                Pizzas = (order.OrderPizzas ?? new List<OrderPizza>())
-                    .Select(op => op.ToCustomerPizzaDTO())
-                    .ToList(),
-                Drinks = (order.OrderDrinks ?? new List<OrderDrink>())
-                    .Select(od => od.Drink.ToDrinkDTO())
-                    .ToList(),
-                Extras = (order.OrderExtras ?? new List<OrderExtra>())
-                    .Select(oe => oe.Extra.ToExtraDTO())
-                    .ToList(),
-                Menus = (order.OrderMenus ?? new List<OrderMenu>())
-                    .Select(om => om.Menu.ToMenuDTO())
-                    .ToList(),
-                EatHere = order.EatHere
             };
         }
 
